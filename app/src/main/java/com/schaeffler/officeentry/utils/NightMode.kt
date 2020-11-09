@@ -6,6 +6,11 @@ import androidx.appcompat.app.AppCompatDelegate
 val isNightMode: Boolean
     get() = AppCompatDelegate.getDefaultNightMode() != AppCompatDelegate.MODE_NIGHT_YES
 
+/**
+ * Turns night mode on or off.
+ *
+ * @param useNightMode `true` for on, otherwise off.
+ */
 fun switchNightMode(useNightMode: Boolean) {
     AppCompatDelegate.setDefaultNightMode(
         if (useNightMode) {
