@@ -10,4 +10,6 @@
 
     <color name="green_200">#69F0AE</color>
     <color name="green_400">#00E676</color>
+
+    <color name="error_dark_theme">#CF6679</color>
 </resources>

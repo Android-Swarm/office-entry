@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Office Entry</string>
+
+    <string name="label_thermal_cam_loading">Waiting for thermal camera</string>
+
+    <string name="content_desc_thermal_image">Thermal heat distribution image.</string>
+    <string name="content_desc_mask_image">Mask detection icon.</string>
 </resources>

@@ -3,6 +3,7 @@ package com.schaeffler.officeentry.ui
 import android.content.Context
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.asLiveData
 import com.google.android.material.snackbar.Snackbar
 import com.robotemi.sdk.TtsRequest
 import com.schaeffler.officeentry.R
@@ -31,7 +32,12 @@ class MainActivityViewModel @ViewModelInject constructor(
         } else {
             Log.d(TAG, "User is wearing mask")
         }
-    }
+    }.asLiveData()
+
+    private val _temiIrSdk = MutableStateFlow(false)
+
+    /** Whether the thermal camera socket is connected and the SDK is ready. */
+    val isThermalCameraReady = _temiIrSdk.asLiveData() //TODO: combine with socket connection
 
     fun showSnackBar(stringId: Int, length: Int = Snackbar.LENGTH_LONG) =
         _snackBarFlow emitValue (getString(stringId) to length)
@@ -41,6 +47,10 @@ class MainActivityViewModel @ViewModelInject constructor(
 
     fun setMaskDetected(detected: Boolean) {
         _maskDetected.value = detected
+    }
+
+    fun setTemiIrSdkState(ready: Boolean) {
+        _temiIrSdk.value = ready
     }
 
     private fun getString(id: Int) = context.getString(id)

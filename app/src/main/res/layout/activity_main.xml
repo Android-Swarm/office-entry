@@ -13,7 +13,9 @@
             android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:defaultNavHost="true" />
+            android:layout_margin="16dp"
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/nav_graph" />
 
         <com.otaliastudios.cameraview.CameraView
             android:id="@+id/cameraView"

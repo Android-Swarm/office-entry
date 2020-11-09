@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatDelegate
 
 /** Whether the application is in night mode or not. */
 val isNightMode: Boolean
-    get() = AppCompatDelegate.getDefaultNightMode() != AppCompatDelegate.MODE_NIGHT_YES
+    get() = AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES
 
 /**
  * Turns night mode on or off.

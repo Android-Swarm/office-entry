@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetector
+import com.ogawa.temiirsdk.IrManager
 import com.schaeffler.officeentry.R
 import com.schaeffler.officeentry.databinding.ActivityMainBinding
 import com.schaeffler.officeentry.extensions.TAG
@@ -21,6 +22,8 @@ import com.schaeffler.officeentry.utils.robot
 import com.schaeffler.officeentry.utils.switchNightMode
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -67,6 +70,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         lifecycleScope.collectLatestStream(viewModel.ttsRequestFlow, robot::speak)
+
+        prepareTemperatureMeasurement()
     }
 
     private fun startMaskDetection() {
@@ -102,6 +107,34 @@ class MainActivity : AppCompatActivity() {
         }
 
         Log.d(TAG, "Mask detection has been configured.")
+    }
+
+    /**
+     * Initializes the Temi-IR SDK.
+     *
+     */
+    private fun prepareTemperatureMeasurement() {
+        // Temp SDK
+        lifecycleScope.launch {
+            do {
+                IrManager.initIr(
+                    application,
+                    getString(R.string.temi_ir_key),
+                    getString(R.string.temi_ir_app_id),
+                )
+
+                delay(1000)
+
+                IrManager.getCheckSuccess().also {
+                    Log.d(
+                        TAG,
+                        if (!it) "Init failed, retrying" else "Init success! Starting measurement"
+                    )
+                }
+            } while (!IrManager.getCheckSuccess())
+
+            viewModel.setTemiIrSdkState(true)
+        }
     }
 
     companion object {

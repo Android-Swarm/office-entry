@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="sharedModel"
+            type="com.schaeffler.officeentry.ui.MainActivityViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.HomeFragment">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonThermalCamera"
+            style="@style/ImageButton"
+            app:icon="@drawable/ic_ir"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageThermal"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="16dp"
+            android:layout_marginTop="64dp"
+            android:contentDescription="@string/content_desc_thermal_image"
+            android:src="@android:color/darker_gray"
+            app:canVisible="@{sharedModel.isThermalCameraReady}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/buttonThermalCamera" />
+
+        <ImageView
+            android:layout_width="@dimen/mask_icon_size"
+            android:layout_height="0dp"
+            android:contentDescription="@string/content_desc_mask_image"
+            android:src="@drawable/ic_medical_mask"
+            app:blinkEnabled="@{!sharedModel.maskDetected}"
+            app:layout_constraintBottom_toBottomOf="@id/imageThermal"
+            app:layout_constraintDimensionRatio="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imageThermal"
+            app:tintInt="@{sharedModel.maskDetected ? @color/green_200 : @color/error_dark_theme}"
+            tools:tint="@color/error_dark_theme" />
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/TextAppearance.MaterialComponents.Headline5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageThermal"
+            app:layout_constraintTop_toTopOf="@id/imageThermal"
+            tools:text="Waiting for user" />
+
+        <androidx.constraintlayout.widget.Group
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="labelCameraLoading,animationCameraLoading"
+            app:isVisible="@{!sharedModel.isThermalCameraReady}" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/labelCameraLoading"
+            style="@style/TextAppearance.MaterialComponents.Headline5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_thermal_cam_loading"
+            app:layout_constraintBottom_toTopOf="@id/animationCameraLoading"
+            app:layout_constraintEnd_toEndOf="@id/imageThermal"
+            app:layout_constraintStart_toStartOf="@id/imageThermal"
+            app:layout_constraintTop_toTopOf="@id/imageThermal"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/animationCameraLoading"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/imageThermal"
+            app:layout_constraintDimensionRatio="5"
+            app:layout_constraintEnd_toEndOf="@id/imageThermal"
+            app:layout_constraintStart_toStartOf="@id/imageThermal"
+            app:layout_constraintTop_toBottomOf="@id/labelCameraLoading"
+            app:lottie_autoPlay="true"
+            app:lottie_colorFilter="?attr/colorPrimary"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/loading_dots" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
