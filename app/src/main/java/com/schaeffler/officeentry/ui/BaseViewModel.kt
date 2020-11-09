@@ -9,4 +9,6 @@ open class BaseViewModel : ViewModel() {
     protected infix fun <T> MutableSharedFlow<T>.emitValue(value: T) = viewModelScope.launch {
         this@emitValue.emit(value)
     }
+
+    protected val TAG = this::class.simpleName
 }
