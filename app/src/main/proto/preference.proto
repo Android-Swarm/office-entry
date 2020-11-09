@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_package = "com.schaeffler.officeentry";
+option java_multiple_files = true;
+
+// Application's settings
+message Preference {
+  // Thermal camera's MAC address
+  string cameraMac = 1;
+
+  // Thermal camera's IP address
+  string cameraIp = 2;
+}
