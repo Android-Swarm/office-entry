@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="snack_bar_camera_rejected">Camera permission rejected! Unable to do mask detection.</string>
+    <string name="snack_bar_location_rejected">Location permission rejected! This is required for setting up the camera.</string>
+
+    <string name="snack_bar_not_connected_to_ogawa">Please connect to OGAWA-IR hotspot!</string>
+    <string name="snack_bar_wrong_wifi">Please connect to %s WiFi!</string>
+
+    <string name="snack_bar_socket_error">Encountered error when connecting to socket: %s</string>
+    <string name="snack_bar_unknown_error">Unknown error!</string>
 </resources>

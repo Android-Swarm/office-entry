@@ -2,9 +2,27 @@ package com.schaeffler.officeentry.extensions
 
 import android.animation.ObjectAnimator
 import android.view.View
-import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
+import androidx.navigation.NavDirections
+import androidx.navigation.findNavController
+
+fun View?.navigate(resId: Int) = this?.run { findNavController().navigate(resId) }
+
+fun View?.navigate(dir: NavDirections) = this?.run { findNavController().navigate(dir) }
+
+@BindingAdapter("onClickPopUntil")
+fun View.onClickPopUntil(resId: Int) {
+    setOnClickListener { it.findNavController().popBackStack(resId, false) }
+}
+
+/**
+ * When the [View] is clicked, navigate to the given destination id.
+ *
+ * @param resId The destination id to navigate to.
+ */
+@BindingAdapter("onClickNavigate")
+fun View.onClickNavigate(resId: Int) = setOnClickListener { navigate(resId) }
 
 /**
  * If [enabled] is `true`, the [View] will play blinking animation. By default, it will blink with

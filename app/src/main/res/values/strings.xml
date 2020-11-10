@@ -3,6 +3,35 @@
 
     <string name="label_thermal_cam_loading">Waiting for thermal camera</string>
 
+    <string name="label_battery">Battery Level</string>
+    <string name="label_ip">IP Address</string>
+    <string name="label_mac">MAC Address</string>
+    <string name="label_wifi">WiFi Address</string>
+    <string name="label_version">Camera Version</string>
+
+    <string name="label_configure_instruction">
+        •\tTurn the camera on\n•\tPress the RESET button on the camera\'s bottom side\n•\tConnect Wi-Fi to OGAWA-IR
+    </string>
+
+    <string name="label_connecting_camera">Connecting camera to the given WiFi credentials</string>
+    <string name="label_request_wifi">
+        Camera is connected to the WiFi, please switch your WiFi connection to the same WiFi as the camera.
+    </string>
+
+    <string name="label_fetching_camera_distribution">
+        Fetching camera network distribution information
+    </string>
+    <string name="label_fetching_success">Successfully fetched camera network distribution information</string>
+    <string name="label_fetching_failed">Failed to fetch camera network distribution information!</string>
+
+    <string name="button_reset">Reset Camera</string>
+    <string name="button_confirm">Confirm</string>
+    <string name="button_connect_camera_to_wifi">Connect Camera to this WiFi</string>
+    <string name="button_retry">Retry</string>
+
+    <string name="hint_wifi_ssid">WiFi SSID</string>
+    <string name="hint_wifi_pwd">Password</string>
+
     <string name="content_desc_thermal_image">Thermal heat distribution image.</string>
     <string name="content_desc_mask_image">Mask detection icon.</string>
 </resources>

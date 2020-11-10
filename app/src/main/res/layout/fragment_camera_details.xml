@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+
+        <variable
+            name="sharedModel"
+            type="com.schaeffler.officeentry.ui.MainActivityViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.CameraDetailsFragment">
+
+        <LinearLayout
+            android:id="@+id/layoutPrompts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/buttonReset"
+            app:layout_constraintEnd_toStartOf="@id/layoutDetails"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/NormalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/label_battery" />
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/NormalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/label_ip" />
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/NormalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/label_mac" />
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/NormalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/label_wifi" />
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/NormalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_version" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/layoutPrompts"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/layoutPrompts"
+            app:layout_constraintTop_toTopOf="@id/layoutPrompts">
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/NormalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:noBlankDefault='@{"-"}'
+                app:noBlankText='@{sharedModel.batteryString}'
+                tools:text="96%" />
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/NormalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:noBlankDefault='@{"-"}'
+                app:noBlankText="@{sharedModel.cameraDetails.deviceIp}"
+                tools:text="192.168.0.100" />
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/NormalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:noBlankDefault='@{"-"}'
+                app:noBlankMac="@{sharedModel.cameraDetails.macAddress}"
+                tools:text="AA:BB:CC:DD:EE:FF" />
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/NormalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:noBlankDefault='@{"-"}'
+                app:noBlankText='@{sharedModel.cameraDetails.targetSsid}'
+                tools:text="GlocalMe_67503" />
+
+            <com.google.android.material.textview.MaterialTextView
+                style="@style/NormalText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:noBlankDefault='@{"-"}'
+                app:noBlankText='@{sharedModel.cameraDetails.version}'
+                tools:text="ESP8266_TT_V1.3" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonReset"
+            style="@style/AppButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_reset"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutDetails"
+            app:onClickNavigate="@{@id/action_cameraDetailsFragment_to_preCameraSetupFragment}" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

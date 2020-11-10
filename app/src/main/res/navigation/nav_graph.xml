@@ -9,5 +9,48 @@
         android:id="@+id/homeFragment"
         android:name="com.schaeffler.officeentry.ui.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_cameraDetailsFragment"
+            app:destination="@id/cameraDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/cameraDetailsFragment"
+        tools:layout="@layout/fragment_camera_details"
+        android:name="com.schaeffler.officeentry.ui.CameraDetailsFragment"
+        android:label="CameraDetailsFragment" >
+        <action
+            android:id="@+id/action_cameraDetailsFragment_to_preCameraSetupFragment"
+            app:destination="@id/preCameraSetupFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/preCameraSetupFragment"
+        tools:layout="@layout/fragment_pre_camera_setup"
+        android:name="com.schaeffler.officeentry.ui.PreCameraSetupFragment"
+        android:label="PreCameraSetupFragment" >
+        <action
+            android:id="@+id/action_preCameraSetupFragment_to_wifiInputFragment"
+            app:destination="@id/wifiInputFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/wifiInputFragment"
+        tools:layout="@layout/fragment_wifi_input"
+        android:name="com.schaeffler.officeentry.ui.WifiInputFragment"
+        android:label="WifiInputFragment" >
+        <action
+            android:id="@+id/action_wifiInputFragment_to_wifiConnectingFragment"
+            app:destination="@id/wifiConnectingFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/wifiConnectingFragment"
+        tools:layout="@layout/fragment_wifi_connecting"
+        android:name="com.schaeffler.officeentry.ui.WifiConnectingFragment"
+        android:label="WifiConnectingFragment" >
+        <argument
+            android:name="mac"
+            app:argType="string" />
+        <argument
+            android:name="wifiSsid"
+            app:argType="string" />
+    </fragment>
 </navigation>

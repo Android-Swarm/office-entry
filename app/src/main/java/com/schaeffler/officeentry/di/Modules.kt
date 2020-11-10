@@ -1,5 +1,8 @@
 package com.schaeffler.officeentry.di
 
+import android.content.Context
+import android.net.wifi.WifiManager
+import androidx.core.content.ContextCompat
 import com.google.mlkit.common.model.LocalModel
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
@@ -9,6 +12,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 
 @InstallIn(ActivityComponent::class)
 @Module
@@ -34,4 +38,9 @@ class ActivityModule {
         .build().run {
             FaceDetection.getClient(this)
         }
+
+
+    @Provides
+    fun provideWifiManager(@ApplicationContext context: Context) =
+        ContextCompat.getSystemService(context, WifiManager::class.java)!!
 }
