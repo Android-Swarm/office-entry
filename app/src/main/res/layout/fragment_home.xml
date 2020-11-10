@@ -18,10 +18,24 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonThermalCamera"
             style="@style/ImageButton"
+            app:blinkEnabled="@{!sharedModel.isThermalCameraReady}"
             app:icon="@drawable/ic_ir"
+            app:iconTint="@{sharedModel.isThermalCameraReady ? @color/green_200 : @color/error_dark_theme}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:onClickNavigate="@{@id/action_homeFragment_to_cameraDetailsFragment}" />
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/NormalText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toBottomOf="@id/buttonThermalCamera"
+            app:layout_constraintStart_toEndOf="@id/buttonThermalCamera"
+            app:layout_constraintTop_toTopOf="@id/buttonThermalCamera"
+            app:noBlankDefault='@{"-"}'
+            app:noBlankText='@{sharedModel.batteryString}'
+            tools:text="97%" />
 
         <ImageView
             android:id="@+id/imageThermal"
@@ -35,7 +49,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/buttonThermalCamera" />
+            app:layout_constraintTop_toBottomOf="@id/buttonThermalCamera"
+            app:srcBitmap="@{sharedModel.thermalImage}" />
 
         <ImageView
             android:layout_width="@dimen/mask_icon_size"
@@ -51,6 +66,7 @@
             tools:tint="@color/error_dark_theme" />
 
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/labelState"
             style="@style/TextAppearance.MaterialComponents.Headline5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -58,6 +74,17 @@
             app:layout_constraintStart_toEndOf="@+id/imageThermal"
             app:layout_constraintTop_toTopOf="@id/imageThermal"
             tools:text="Waiting for user" />
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/TextAppearance.MaterialComponents.Headline5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:celciusTempText="@{sharedModel.temperature}"
+            app:layout_constraintBottom_toBottomOf="@id/labelState"
+            app:layout_constraintEnd_toEndOf="@id/labelState"
+            app:layout_constraintStart_toStartOf="@id/labelState"
+            app:layout_constraintTop_toTopOf="@id/labelState"
+            tools:text="36.5℃" />
 
         <androidx.constraintlayout.widget.Group
             android:layout_width="wrap_content"

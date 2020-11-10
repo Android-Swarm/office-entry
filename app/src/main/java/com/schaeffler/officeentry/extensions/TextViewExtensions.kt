@@ -42,3 +42,6 @@ fun TextView.blankDefaultMac(mac: String?, noBlankDefault: String) {
 fun <T> MaterialAutoCompleteTextView.simpleAdapter(content: List<T>?) {
     setAdapter(ArrayAdapter(context, android.R.layout.simple_list_item_1, content ?: listOf()))
 }
+
+@BindingAdapter("celciusTempText")
+fun TextView.celciusTemp(temp: Float?) = temp?.let { text = String.format("%.1f℃", temp) }

@@ -6,6 +6,7 @@ buildscript {
         coroutines_android_version = "1.4.0"
         lifecycle_version = "2.2.0"
         hilt_version = "2.28-alpha"
+        glide_version = "4.11.0"
     }
 
     repositories {
