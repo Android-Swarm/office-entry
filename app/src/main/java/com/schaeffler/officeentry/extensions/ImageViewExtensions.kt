@@ -3,7 +3,6 @@ package com.schaeffler.officeentry.extensions
 import android.graphics.Bitmap
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
-import com.bumptech.glide.Glide
 
 
 /**
@@ -16,8 +15,5 @@ fun ImageView.tintColor(color: Int?) = color?.let { setColorFilter(color) } ?: c
 
 @BindingAdapter("srcBitmap")
 fun ImageView.bitmapSrc(bitmap: Bitmap?) {
-    Glide.with(context)
-        .load(bitmap)
-        .fallback(android.R.color.darker_gray)
-        .into(this)
+    setImageBitmap(bitmap)
 }

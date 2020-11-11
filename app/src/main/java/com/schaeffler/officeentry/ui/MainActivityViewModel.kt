@@ -51,6 +51,11 @@ class MainActivityViewModel @ViewModelInject constructor(
 
     private val _temiIrSdk = MutableStateFlow(false)
 
+    /** Whether the thermal camera socket is connected and the SDK is ready. */
+    val isThermalCameraReady = _temiIrSdk.combine(_batteryString) { sdk, battery ->
+        sdk && battery.isNotBlank()
+    }.asLiveData()
+
     /** Contains camera's mac, ip, and the sdk state. Both Mac and IP are not blank. */
     private val cameraConnectItems = repository.cameraConnectionDetail
         .filter { (mac, ip) -> mac.isNotBlank() && ip.isNotBlank() }
@@ -92,37 +97,42 @@ class MainActivityViewModel @ViewModelInject constructor(
             val distance = (frmZero.distance + frmOne.distance) / 2
             val temp = IrDataUtil.getResult(frmZero.body, frmOne.body) ?: -1.0
 
+            Log.d(TAG, "Temp: $temp, Distance: $distance")
+
             Pair(temp, distance)
         }.filter { (temp, distance) -> temp in 30.0..42.0 && distance in Int.MIN_VALUE until 500 }
         .map { (temp, _) -> temp.toFloat() }
         .asLiveData()
 
+    private val _userInteraction = MutableStateFlow(false)
+
     init {
+        // Get camera details
         viewModelScope.launch {
-            _cameraDetailsState emitValue CameraDetailsFetcher("520291E24E53")
-                .cameraDetailsAsync(this)
-                .await()
+            cameraConnectItems.map { (mac, _, _) -> mac.also { Log.d(TAG, "Mac: $mac") } }
+                .distinctUntilChanged()
+                .collectLatest {
+                    _cameraDetailsState emitValue CameraDetailsFetcher(it)
+                        .cameraDetailsAsync(this)
+                        .await()
+                }
         }
 
         // Poll for battery
         viewModelScope.launch {
-            cameraConnectItems.distinctUntilChangedBy { (_, ip, _) -> ip } // Only when IP changes
-                .collectLatest { (mac, ip, _) ->
-                    pollBattery(ip, mac)
-                }
+            cameraConnectItems.collectLatest { (mac, ip, _) ->
+                pollBattery(ip, mac)
+            }
         }
 
         // Start temperature taking
         viewModelScope.launch {
             cameraConnectItems.filter { (_, _, sdkReady) -> sdkReady }
                 .collectLatest { (mac, ip, _) ->
-                    startTemperatureTaking(this, ip, mac)
+                    startTemperatureTaking(ip, mac)
                 }
         }
     }
-
-    /** Whether the thermal camera socket is connected and the SDK is ready. */
-    val isThermalCameraReady = _temiIrSdk.asLiveData() //TODO: combine with socket connection
 
     fun showSnackBar(stringId: Int, length: Int = Snackbar.LENGTH_LONG) =
         _snackBarFlow emitValue (getString(stringId) to length)
@@ -145,10 +155,14 @@ class MainActivityViewModel @ViewModelInject constructor(
         repository.saveCameraConnectionDetails(mac, ip)
     }
 
-    private fun pollBattery(ip: String, mac: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+    fun updateUserInteraction(interacting: Boolean) {
+        _userInteraction.value = interacting
+    }
+
+    private suspend fun pollBattery(ip: String, mac: String) {
+        withContext(Dispatchers.IO) {
             try {
-                withSocketOperation(ip, CameraConfig.BATTERY_SOCKET) { _, writer, reader ->
+                withSocketOperation(ip, CameraConfig.BATTERY_SOCKET) { s, writer, reader ->
                     Log.d(TAG, "Connected to battery socket at $ip")
 
                     while (true) {
@@ -181,14 +195,12 @@ class MainActivityViewModel @ViewModelInject constructor(
                 _batteryString.value = ""
 
                 reFetchCameraDetails(mac)
-
-                rePostSdkState()
             }
         }
     }
 
-    private fun startTemperatureTaking(scope: CoroutineScope, ip: String, mac: String) =
-        scope.launch(Dispatchers.IO) {
+    private suspend fun startTemperatureTaking(ip: String, mac: String) =
+        withContext(Dispatchers.IO) {
             try {
                 withSocketOperation(ip, CameraConfig.TEMP_PORT) { _, tempWriter, tempReader ->
                     Log.d(TAG, "Connected to temp socket at $ip")
@@ -256,7 +268,7 @@ class MainActivityViewModel @ViewModelInject constructor(
                 reFetchCameraDetails(mac)
                 // This should re-trigger the temperature flow
 
-                return@launch
+                return@withContext
             } catch (e: CancellationException) {
                 Log.d(TAG, "Stopping due to coroutine cancellation")
             } catch (e: IllegalStateException) {
@@ -351,21 +363,24 @@ class MainActivityViewModel @ViewModelInject constructor(
 
         try {
             val newDetails = CameraDetailsFetcher(mac).cameraDetailsAsync(this).await()!!
-            repository.saveCameraConnectionDetails(newDetails.deviceIp, newDetails.macAddress)
+            repository.saveCameraConnectionDetails(newDetails.macAddress, newDetails.deviceIp)
 
             Log.d(TAG, "Fetched new camera details, overwritten data store")
         } catch (e: Exception) {
             Log.e(TAG, "Unable to re-fetch camera details: ", e)
 
             // Retry to connect
-            rePostSdkState()
+//            rePostSdkState()
         }
+
+        rePostSdkState()
     }
 
     private fun rePostSdkState() {
-        repeat(2) {
-            _temiIrSdk.value = !_temiIrSdk.value
-        }
+        val tmp = _temiIrSdk.value
+
+        _temiIrSdk.value = (!tmp).also { Log.d(TAG, "Set SDK ready to $it") }
+        _temiIrSdk.value = tmp.also { Log.d(TAG, "Set SDK ready to $it") }
     }
 
     private fun getString(id: Int) = context.getString(id)

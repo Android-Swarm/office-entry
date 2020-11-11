@@ -43,7 +43,7 @@ class PreCameraSetupFragment : BindingFragment<FragmentPreCameraSetupBinding>() 
         if (wifiManager.currentSsid != CameraConfig.OGAWA_HOTSPOT_NAME) {
             sharedViewModel.showSnackBar(R.string.snack_bar_not_connected_to_ogawa)
             Log.d(TAG, "User is connected to ${wifiManager.currentSsid}")
-//            return
+            return
         }
 
         v.navigate(R.id.action_preCameraSetupFragment_to_wifiInputFragment)

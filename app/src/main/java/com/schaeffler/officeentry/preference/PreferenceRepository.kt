@@ -44,7 +44,7 @@ class PreferenceRepository @Inject constructor(@ApplicationContext context: Cont
      */
     @Suppress("UsePropertyAccessSyntax") // Data store needs to use generated setter
     suspend fun saveCameraConnectionDetails(mac: String, ip: String) {
-        require(!mac.contains(":")) { "The camera's MAC address should not include the \":\"" }
+        require(!mac.contains(Regex("[:.]"))) { "The camera's MAC address should not include the \":\" or \".\"" }
 
         savePreference {
             setCameraIp(ip)

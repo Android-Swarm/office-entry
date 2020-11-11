@@ -91,17 +91,16 @@ class MainActivity : AppCompatActivity() {
                     InputImage.IMAGE_FORMAT_NV21
                 )
 
-                val faces = faceDetector.process(inputImage).await()
+                val face = faceDetector.process(inputImage).await().firstOrNull()
+
+                viewModel.updateUserInteraction(face != null)
 
                 // Check for mask only if there is a face detected
-                faces.firstOrNull()
-                    ?.let { _ ->
-                        maskDetector.detectMask(inputImage).run {
-                            viewModel.setMaskDetected(isWearingMask)
-                        }
-                    } ?: viewModel.setMaskDetected(true).also {
-                    Log.d(TAG, "No face detected")
-                }
+                face?.let { _ ->
+                    maskDetector.detectMask(inputImage).run {
+                        viewModel.setMaskDetected(isWearingMask)
+                    }
+                } ?: viewModel.setMaskDetected(true)
 
             }
         }
