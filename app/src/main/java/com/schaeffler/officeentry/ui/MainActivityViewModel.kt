@@ -13,6 +13,7 @@ import com.schaeffler.officeentry.R
 import com.schaeffler.officeentry.extensions.*
 import com.schaeffler.officeentry.preference.PreferenceRepository
 import com.schaeffler.officeentry.thermal.*
+import com.schaeffler.officeentry.utils.AppState
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -92,7 +93,7 @@ class MainActivityViewModel @ViewModelInject constructor(
         .asLiveData()
 
     /** Measured temperature and distance from the camera. */
-    val temperature = frmFlow
+    val temperatureFlow = frmFlow
         .map { (frmZero, frmOne) ->
             val distance = (frmZero.distance + frmOne.distance) / 2
             val temp = IrDataUtil.getResult(frmZero.body, frmOne.body) ?: -1.0
@@ -102,9 +103,17 @@ class MainActivityViewModel @ViewModelInject constructor(
             Pair(temp, distance)
         }.filter { (temp, distance) -> temp in 30.0..42.0 && distance in Int.MIN_VALUE until 500 }
         .map { (temp, _) -> temp.toFloat() }
-        .asLiveData()
+
+    val temperature = temperatureFlow.asLiveData()
 
     private val _userInteraction = MutableStateFlow(false)
+    val userInteraction: StateFlow<Boolean> = _userInteraction
+
+    private val _appState = MutableStateFlow(AppState.IDLE)
+    val appState: StateFlow<AppState> = _appState
+    val appStateLive = _appState.asLiveData()
+
+    private val _receivedUserTemperature = MutableStateFlow(false)
 
     init {
         // Get camera details
@@ -157,6 +166,10 @@ class MainActivityViewModel @ViewModelInject constructor(
 
     fun updateUserInteraction(interacting: Boolean) {
         _userInteraction.value = interacting
+    }
+
+    fun updateApplicationState(state: AppState) {
+        _appState.value = state
     }
 
     private suspend fun pollBattery(ip: String, mac: String) {
@@ -358,6 +371,8 @@ class MainActivityViewModel @ViewModelInject constructor(
      * @param mac The camera's MAC address. This should not be blank
      */
     private fun reFetchCameraDetails(mac: String) = viewModelScope.launch {
+        updateApplicationState(AppState.IDLE)
+
         Log.d(TAG, "Re-fetching camera details in 5 seconds")
         delay(5000)
 
@@ -368,9 +383,6 @@ class MainActivityViewModel @ViewModelInject constructor(
             Log.d(TAG, "Fetched new camera details, overwritten data store")
         } catch (e: Exception) {
             Log.e(TAG, "Unable to re-fetch camera details: ", e)
-
-            // Retry to connect
-//            rePostSdkState()
         }
 
         rePostSdkState()

@@ -4,6 +4,8 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import com.schaeffler.officeentry.R
+import com.schaeffler.officeentry.utils.AppState
 
 val TextView.textString
     get() = text?.toString() ?: ""
@@ -45,3 +47,12 @@ fun <T> MaterialAutoCompleteTextView.simpleAdapter(content: List<T>?) {
 
 @BindingAdapter("celciusTempText")
 fun TextView.celciusTemp(temp: Float?) = temp?.let { text = String.format("%.1f℃", temp) }
+
+@BindingAdapter("textState")
+fun TextView.appStateText(state: AppState?) {
+    text = when (state) {
+        null, AppState.IDLE -> context.getString(R.string.label_idle)
+        AppState.COLLECTING -> context.getString(R.string.label_collecting)
+        AppState.COMPLETE -> context.getString(R.string.label_complete)
+    }
+}

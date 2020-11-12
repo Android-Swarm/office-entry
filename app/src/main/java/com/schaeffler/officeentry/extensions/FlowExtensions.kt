@@ -2,6 +2,7 @@ package com.schaeffler.officeentry.extensions
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.scan
 
 /**
  * Executes the given [block] without transforming the [Flow]. Internally, each value will

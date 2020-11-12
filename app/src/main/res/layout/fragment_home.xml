@@ -73,17 +73,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageThermal"
             app:layout_constraintTop_toTopOf="@id/imageThermal"
+            app:textState="@{sharedModel.appStateLive}"
             tools:text="Waiting for user" />
 
         <com.google.android.material.textview.MaterialTextView
             style="@style/TextAppearance.MaterialComponents.Headline5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             app:celciusTempText="@{sharedModel.temperature}"
-            app:layout_constraintBottom_toBottomOf="@id/labelState"
             app:layout_constraintEnd_toEndOf="@id/labelState"
             app:layout_constraintStart_toStartOf="@id/labelState"
-            app:layout_constraintTop_toTopOf="@id/labelState"
+            app:layout_constraintTop_toBottomOf="@id/labelState"
             tools:text="36.5℃" />
 
         <androidx.constraintlayout.widget.Group

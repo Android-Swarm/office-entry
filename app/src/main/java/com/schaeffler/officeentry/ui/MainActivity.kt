@@ -16,19 +16,16 @@ import com.schaeffler.officeentry.R
 import com.schaeffler.officeentry.databinding.ActivityMainBinding
 import com.schaeffler.officeentry.extensions.TAG
 import com.schaeffler.officeentry.extensions.collectLatestStream
-import com.schaeffler.officeentry.utils.MaskDetector
-import com.schaeffler.officeentry.utils.isNightMode
-import com.schaeffler.officeentry.utils.robot
-import com.schaeffler.officeentry.utils.switchNightMode
+import com.schaeffler.officeentry.utils.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @AndroidEntryPoint
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class MainActivity : AppCompatActivity() {
     private val viewModel by viewModels<MainActivityViewModel>()
 
@@ -70,6 +67,51 @@ class MainActivity : AppCompatActivity() {
         }
 
         lifecycleScope.collectLatestStream(viewModel.ttsRequestFlow, robot::speak)
+
+        lifecycleScope.collectLatestStream(viewModel.appState) { state ->
+            when (state) {
+                AppState.IDLE -> viewModel.userInteraction.filter { it }
+                    .take(1)
+                    .collect {
+                        Log.d(TAG, "Face detected, start temperature collection")
+                        viewModel.updateApplicationState(AppState.COLLECTING)
+                    }
+
+                AppState.COLLECTING -> {
+                    val totalTemp = viewModel.temperatureFlow.take(TEMP_COUNT)
+                        .onStart { /* Ask user to come closer */ }
+                        .onEach { /* Update text to detecting */ }
+                        .onCompletion { Log.d(TAG, "Received $TEMP_COUNT valid temperatures") }
+                        .reduce { acc, value -> acc + value }
+
+                    Log.d(TAG, "Final temperature: %.2f".format(totalTemp / TEMP_COUNT))
+
+                    viewModel.updateApplicationState(AppState.COMPLETE)
+
+                }
+
+                AppState.COMPLETE -> {
+                    listOf(1, 2, 3).asFlow().onEach { delay(1000) }
+                        .collect {
+                            if (it == 3) {
+                                Log.d(TAG, "Waited 3 seconds, returning to ${AppState.IDLE}")
+                                viewModel.updateApplicationState(AppState.IDLE)
+                            }
+                        }
+                }
+            }
+
+            lifecycleScope.collectLatestStream(
+                viewModel.userInteraction
+                    .debounce(2000)
+            ) { interacting ->
+                if (!interacting) {
+                    if (viewModel.appState.value == AppState.COLLECTING) {
+                        viewModel.updateApplicationState(AppState.IDLE)
+                    }
+                }
+            }
+        }
 
         prepareTemperatureMeasurement()
     }
@@ -138,5 +180,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val CAMERA_PERMISSION = Manifest.permission.CAMERA
+        const val TEMP_COUNT = 5
     }
 }

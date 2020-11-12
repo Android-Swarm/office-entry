@@ -24,6 +24,10 @@
     <string name="label_fetching_success">Successfully fetched camera network distribution information</string>
     <string name="label_fetching_failed">Failed to fetch camera network distribution information!</string>
 
+    <string name="label_idle">Waiting for User</string>
+    <string name="label_collecting">Measuring Temperature</string>
+    <string name="label_complete">Your Temperature</string>
+
     <string name="button_reset">Reset Camera</string>
     <string name="button_confirm">Confirm</string>
     <string name="button_connect_camera_to_wifi">Connect Camera to this WiFi</string>
