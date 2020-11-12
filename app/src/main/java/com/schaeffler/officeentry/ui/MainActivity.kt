@@ -70,34 +70,37 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.collectLatestStream(viewModel.appState) { state ->
             when (state) {
-                AppState.IDLE -> viewModel.userInteraction.filter { it }
-                    .take(1)
-                    .collect {
-                        Log.d(TAG, "Face detected, start temperature collection")
-                        viewModel.updateApplicationState(AppState.COLLECTING)
-                    }
+                AppState.IDLE -> {
+                    viewModel.userInteraction.filter { it }
+                        .take(1)
+                        .collect {
+                            Log.d(TAG, "Face detected, start temperature collection")
+                            viewModel.updateApplicationState(AppState.COLLECTING)
+                        }
+                }
 
                 AppState.COLLECTING -> {
                     val totalTemp = viewModel.temperatureFlow.take(TEMP_COUNT)
-                        .onStart { /* Ask user to come closer */ }
-                        .onEach { /* Update text to detecting */ }
+                        .onStart { viewModel.updateReceivedFirstTemperature(false) }
+                        .onEach { viewModel.updateReceivedFirstTemperature(true) }
                         .onCompletion { Log.d(TAG, "Received $TEMP_COUNT valid temperatures") }
                         .reduce { acc, value -> acc + value }
 
-                    Log.d(TAG, "Final temperature: %.2f".format(totalTemp / TEMP_COUNT))
+                    val finalTemp = totalTemp / TEMP_COUNT
 
+                    Log.d(TAG, "Final temperature: %.2f".format(finalTemp))
+                    viewModel.finalizeTemperature(finalTemp)
                     viewModel.updateApplicationState(AppState.COMPLETE)
 
                 }
 
                 AppState.COMPLETE -> {
-                    listOf(1, 2, 3).asFlow().onEach { delay(1000) }
-                        .collect {
-                            if (it == 3) {
-                                Log.d(TAG, "Waited 3 seconds, returning to ${AppState.IDLE}")
-                                viewModel.updateApplicationState(AppState.IDLE)
-                            }
+                    (1..5).asFlow().onEach { delay(1000) }
+                        .onCompletion {
+                            Log.d(TAG, "End of delay, returning to ${AppState.IDLE}")
+                            viewModel.updateApplicationState(AppState.IDLE)
                         }
+                        .collect()
                 }
             }
 

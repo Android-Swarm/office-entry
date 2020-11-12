@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="com.schaeffler.officeentry.utils.AppState" />
+
         <variable
             name="sharedModel"
             type="com.schaeffler.officeentry.ui.MainActivityViewModel" />
@@ -26,6 +28,7 @@
             app:onClickNavigate="@{@id/action_homeFragment_to_cameraDetailsFragment}" />
 
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/materialTextView"
             style="@style/NormalText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -53,11 +56,13 @@
             app:srcBitmap="@{sharedModel.thermalImage}" />
 
         <ImageView
+            android:id="@+id/imageMask"
             android:layout_width="@dimen/mask_icon_size"
             android:layout_height="0dp"
             android:contentDescription="@string/content_desc_mask_image"
             android:src="@drawable/ic_medical_mask"
             app:blinkEnabled="@{!sharedModel.maskDetected}"
+            app:isVisible="@{sharedModel.appStateLive != AppState.IDLE}"
             app:layout_constraintBottom_toBottomOf="@id/imageThermal"
             app:layout_constraintDimensionRatio="1"
             app:layout_constraintEnd_toEndOf="parent"
@@ -70,22 +75,82 @@
             style="@style/TextAppearance.MaterialComponents.Headline5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="36sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageThermal"
             app:layout_constraintTop_toTopOf="@id/imageThermal"
             app:textState="@{sharedModel.appStateLive}"
             tools:text="Waiting for user" />
 
+        <ImageView
+            android:layout_width="@dimen/mask_icon_size"
+            android:layout_height="@dimen/mask_icon_size"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_waiting"
+            app:isVisible="@{sharedModel.appStateLive == AppState.IDLE}"
+            app:layout_constraintEnd_toEndOf="@id/labelState"
+            app:layout_constraintStart_toStartOf="@id/labelState"
+            app:layout_constraintTop_toBottomOf="@id/labelState"
+            app:tint="@color/design_default_color_secondary" />
+
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/labelTemperature"
             style="@style/TextAppearance.MaterialComponents.Headline5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            app:canVisible="@{sharedModel.appStateLive == AppState.COLLECTING &amp;&amp; sharedModel.receivedUserTemperature}"
             app:celciusTempText="@{sharedModel.temperature}"
             app:layout_constraintEnd_toEndOf="@id/labelState"
             app:layout_constraintStart_toStartOf="@id/labelState"
             app:layout_constraintTop_toBottomOf="@id/labelState"
             tools:text="36.5℃" />
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/TextAppearance.MaterialComponents.Headline5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/label_too_far"
+            app:isVisible="@{sharedModel.appStateLive == AppState.COLLECTING &amp;&amp; !sharedModel.receivedUserTemperature}"
+            app:layout_constraintEnd_toEndOf="@id/labelTemperature"
+            app:layout_constraintStart_toStartOf="@id/labelTemperature"
+            app:layout_constraintTop_toTopOf="@id/labelTemperature" />
+
+
+        <androidx.constraintlayout.widget.Group
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="labelTemperatureFinal,labelCompletionMessage"
+            app:isVisible="@{sharedModel.appStateLive == AppState.COMPLETE}" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/labelTemperatureFinal"
+            style="@style/TextAppearance.MaterialComponents.Headline5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="48sp"
+            android:textStyle="bold"
+            app:celciusTempText="@{sharedModel.finalTemperature}"
+            app:layout_constraintEnd_toEndOf="@id/labelState"
+            app:layout_constraintStart_toStartOf="@id/labelState"
+            app:layout_constraintTop_toBottomOf="@id/labelState"
+            tools:text="36.5℃" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/labelCompletionMessage"
+            style="@style/TextAppearance.MaterialComponents.Body1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="@{sharedModel.completionMessage}"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@id/imageMask"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imageThermal"
+            tools:text="@string/label_abnormal_temp" />
 
         <androidx.constraintlayout.widget.Group
             android:layout_width="wrap_content"

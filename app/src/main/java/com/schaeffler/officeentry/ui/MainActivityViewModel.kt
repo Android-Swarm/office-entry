@@ -104,7 +104,21 @@ class MainActivityViewModel @ViewModelInject constructor(
         }.filter { (temp, distance) -> temp in 30.0..42.0 && distance in Int.MIN_VALUE until 500 }
         .map { (temp, _) -> temp.toFloat() }
 
+    /** Temperature blasted from the camera. */
     val temperature = temperatureFlow.asLiveData()
+
+    private val _finalTemperature = MutableSharedFlow<Float>()
+
+    /** The average temperature of a number of temperatures. The user's final temperature. */
+    val finalTemperature = _finalTemperature.asLiveData()
+
+    val completionMessage = _finalTemperature.map {
+        if (it > 37.4f) {
+            getString(R.string.label_abnormal_temp)
+        } else {
+            getString(R.string.label_normal_temp)
+        }
+    }.asLiveData()
 
     private val _userInteraction = MutableStateFlow(false)
     val userInteraction: StateFlow<Boolean> = _userInteraction
@@ -114,6 +128,9 @@ class MainActivityViewModel @ViewModelInject constructor(
     val appStateLive = _appState.asLiveData()
 
     private val _receivedUserTemperature = MutableStateFlow(false)
+
+    /** `true` when the user has recorded at least 1 valid temperature. */
+    val receivedUserTemperature = _receivedUserTemperature.asLiveData()
 
     init {
         // Get camera details
@@ -170,6 +187,12 @@ class MainActivityViewModel @ViewModelInject constructor(
 
     fun updateApplicationState(state: AppState) {
         _appState.value = state
+    }
+
+    fun finalizeTemperature(temperature: Float) = _finalTemperature emitValue temperature
+
+    fun updateReceivedFirstTemperature(received: Boolean) {
+        _receivedUserTemperature.value = received
     }
 
     private suspend fun pollBattery(ip: String, mac: String) {

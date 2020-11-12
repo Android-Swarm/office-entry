@@ -28,6 +28,13 @@
     <string name="label_collecting">Measuring Temperature</string>
     <string name="label_complete">Your Temperature</string>
 
+    <string name="label_too_far">Please come closer to the camera</string>
+
+    <string name="label_normal_temp">Please record your temperature in the Microsoft Form in the iPad</string>
+    <string name="label_abnormal_temp">
+        Please try again or double check your temperature with the infrared thermometer
+    </string>
+
     <string name="button_reset">Reset Camera</string>
     <string name="button_confirm">Confirm</string>
     <string name="button_connect_camera_to_wifi">Connect Camera to this WiFi</string>

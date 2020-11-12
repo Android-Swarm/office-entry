@@ -34,6 +34,7 @@ class ActivityModule {
 
     @Provides
     fun provideFaceDetector() = FaceDetectorOptions.Builder()
+        .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
         .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
         .build().run {
             FaceDetection.getClient(this)
