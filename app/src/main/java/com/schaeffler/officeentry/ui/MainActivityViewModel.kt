@@ -101,7 +101,7 @@ class MainActivityViewModel @ViewModelInject constructor(
             Log.d(TAG, "Temp: $temp, Distance: $distance")
 
             Pair(temp, distance)
-        }.filter { (temp, distance) -> temp in 30.0..42.0 && distance in Int.MIN_VALUE until 500 }
+        }.filter { (temp, distance) -> temp in 30.0..42.0 && distance in Int.MIN_VALUE until 800 }
         .map { (temp, _) -> temp.toFloat() }
 
     /** Temperature blasted from the camera. */
@@ -114,8 +114,10 @@ class MainActivityViewModel @ViewModelInject constructor(
 
     val completionMessage = _finalTemperature.map {
         if (it > 37.4f) {
+            requestTemiSpeak(R.string.tts_abnormal_temp, it)
             getString(R.string.label_abnormal_temp)
         } else {
+            requestTemiSpeak(R.string.tts_normal_temp, it)
             getString(R.string.label_normal_temp)
         }
     }.asLiveData()
@@ -128,6 +130,9 @@ class MainActivityViewModel @ViewModelInject constructor(
     val appStateLive = _appState.asLiveData()
 
     private val _receivedUserTemperature = MutableStateFlow(false)
+    val tempDetecting =
+        _receivedUserTemperature.combine(appState) { first, state -> first to state }
+            .distinctUntilChanged()
 
     /** `true` when the user has recorded at least 1 valid temperature. */
     val receivedUserTemperature = _receivedUserTemperature.asLiveData()
@@ -166,8 +171,8 @@ class MainActivityViewModel @ViewModelInject constructor(
     fun showSnackBar(stringId: Int, vararg args: Any?, length: Int = Snackbar.LENGTH_LONG) =
         _snackBarFlow emitValue (getString(stringId).format(*args) to length)
 
-    fun requestTemiSpeak(stringId: Int, show: Boolean = false) =
-        _ttsRequestFlow emitValue (getString(stringId) to show)
+    fun requestTemiSpeak(stringId: Int, vararg args: Any?, show: Boolean = false) =
+        _ttsRequestFlow emitValue (getString(stringId).format(*args) to show)
 
     fun setMaskDetected(detected: Boolean) {
         _maskDetected.value = detected
@@ -198,7 +203,7 @@ class MainActivityViewModel @ViewModelInject constructor(
     private suspend fun pollBattery(ip: String, mac: String) {
         withContext(Dispatchers.IO) {
             try {
-                withSocketOperation(ip, CameraConfig.BATTERY_SOCKET) { s, writer, reader ->
+                withSocketOperation(ip, CameraConfig.BATTERY_SOCKET) { _, writer, reader ->
                     Log.d(TAG, "Connected to battery socket at $ip")
 
                     while (true) {
@@ -217,10 +222,13 @@ class MainActivityViewModel @ViewModelInject constructor(
                                 }
 
                         // Update live data
-                        val number = response.filter { it.isDigit() }.toFloat()
-                        val battery = ((number - 800f) / 200f).coerceIn(0f, 1f)
+                        response.filter { it.isDigit() }
+                            .toFloatOrNull()
+                            ?.let { number ->
+                                val battery = ((number - 800f) / 200f).coerceIn(0f, 1f)
 
-                        _batteryString.value = "%.1f".format(battery * 100) + "%"
+                                _batteryString.value = "%.1f".format(battery * 100) + "%"
+                            }
 
                         delay(10000)
                     }

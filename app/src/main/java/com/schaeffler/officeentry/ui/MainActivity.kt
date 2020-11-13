@@ -12,6 +12,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetector
 import com.ogawa.temiirsdk.IrManager
+import com.robotemi.sdk.listeners.OnDetectionStateChangedListener
 import com.schaeffler.officeentry.R
 import com.schaeffler.officeentry.databinding.ActivityMainBinding
 import com.schaeffler.officeentry.extensions.TAG
@@ -26,7 +27,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnDetectionStateChangedListener {
     private val viewModel by viewModels<MainActivityViewModel>()
 
     private val requestPermission =
@@ -50,6 +51,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        robot.addOnDetectionStateChangedListener(this)
 
         if (!isNightMode) {
             switchNightMode(true)
@@ -81,9 +84,11 @@ class MainActivity : AppCompatActivity() {
 
                 AppState.COLLECTING -> {
                     val totalTemp = viewModel.temperatureFlow.take(TEMP_COUNT)
-                        .onStart { viewModel.updateReceivedFirstTemperature(false) }
                         .onEach { viewModel.updateReceivedFirstTemperature(true) }
-                        .onCompletion { Log.d(TAG, "Received $TEMP_COUNT valid temperatures") }
+                        .onCompletion {
+                            Log.d(TAG, "Received $TEMP_COUNT valid temperatures")
+                            viewModel.updateReceivedFirstTemperature(false)
+                        }
                         .reduce { acc, value -> acc + value }
 
                     val finalTemp = totalTemp / TEMP_COUNT
@@ -95,12 +100,19 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 AppState.COMPLETE -> {
-                    (1..5).asFlow().onEach { delay(1000) }
+                    (1..7).asFlow().onEach { delay(1000) }
                         .onCompletion {
                             Log.d(TAG, "End of delay, returning to ${AppState.IDLE}")
                             viewModel.updateApplicationState(AppState.IDLE)
                         }
                         .collect()
+                }
+            }
+
+            lifecycleScope.collectLatestStream(viewModel.tempDetecting) { (first, state) ->
+                if (first && state == AppState.COLLECTING) {
+                    Log.d(TAG, "Received first temperature of the user")
+                    viewModel.requestTemiSpeak(R.string.tts_start_collecting)
                 }
             }
 
@@ -117,6 +129,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         prepareTemperatureMeasurement()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        robot.removeDetectionStateChangedListener(this)
     }
 
     private fun startMaskDetection() {
@@ -183,6 +201,10 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val CAMERA_PERMISSION = Manifest.permission.CAMERA
-        const val TEMP_COUNT = 5
+        const val TEMP_COUNT = 3
+    }
+
+    override fun onDetectionStateChanged(state: Int) {
+        Log.d(TAG, "Detection state change: $state")
     }
 }

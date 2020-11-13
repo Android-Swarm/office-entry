@@ -26,6 +26,7 @@ class ActivityModule {
 
         val customOptions = CustomObjectDetectorOptions.Builder(localModel)
             .setDetectorMode(CustomObjectDetectorOptions.SINGLE_IMAGE_MODE)
+            .setClassificationConfidenceThreshold(0.8f)
             .enableClassification()
             .build()
 

@@ -26,9 +26,12 @@
 
     <string name="label_idle">Waiting for User</string>
     <string name="label_collecting">Measuring Temperature</string>
+    <string name="label_hold_on">Hold on</string>
     <string name="label_complete">Your Temperature</string>
 
-    <string name="label_too_far">Please come closer to the camera</string>
+    <string name="label_too_far">Please come closer to the thermal camera</string>
+
+    <string name="label_scan_qr">Please scan the SafeEntry QR code</string>
 
     <string name="label_normal_temp">Please record your temperature in the Microsoft Form in the iPad</string>
     <string name="label_abnormal_temp">
@@ -45,4 +48,6 @@
 
     <string name="content_desc_thermal_image">Thermal heat distribution image.</string>
     <string name="content_desc_mask_image">Mask detection icon.</string>
+    <string name="content_desc_qr_code">Safe Entry QR Code.</string>
+    <string name="content_desc_waiting_user_icon">Waiting for user.</string>
 </resources>

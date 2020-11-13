@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tts_no_mask_detected">Please wear your mask properly at all times.</string>
+    <string name="tts_normal_temp">%.1f degree celcius, normal temperature</string>
+    <string name="tts_abnormal_temp">%.1f degree celcius, abnormal temperature</string>
+    <string name="tts_start_collecting">Detecting</string>
 </resources>
