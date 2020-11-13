@@ -12,7 +12,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetector
 import com.ogawa.temiirsdk.IrManager
-import com.robotemi.sdk.listeners.OnDetectionStateChangedListener
 import com.schaeffler.officeentry.R
 import com.schaeffler.officeentry.databinding.ActivityMainBinding
 import com.schaeffler.officeentry.extensions.TAG
@@ -27,7 +26,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-class MainActivity : AppCompatActivity(), OnDetectionStateChangedListener {
+class MainActivity : AppCompatActivity() {
     private val viewModel by viewModels<MainActivityViewModel>()
 
     private val requestPermission =
@@ -52,8 +51,7 @@ class MainActivity : AppCompatActivity(), OnDetectionStateChangedListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        robot.addOnDetectionStateChangedListener(this)
-
+        // Set to night mode
         if (!isNightMode) {
             switchNightMode(true)
         }
@@ -61,16 +59,20 @@ class MainActivity : AppCompatActivity(), OnDetectionStateChangedListener {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.lifecycleOwner = this
 
+        // Request cam for mask detection
         requestPermission.launch(CAMERA_PERMISSION)
 
+        // Show snack bar
         lifecycleScope.collectLatestStream(viewModel.snackBarFlow) { (message, length) ->
             Snackbar.make(binding.root, message, length)
                 .setAction(android.R.string.ok) { /* Dismiss snack bar on click */ }
                 .show()
         }
 
+        // Speak tts
         lifecycleScope.collectLatestStream(viewModel.ttsRequestFlow, robot::speak)
 
+        // Logic for each application states
         lifecycleScope.collectLatestStream(viewModel.appState) { state ->
             when (state) {
                 AppState.IDLE -> {
@@ -108,6 +110,7 @@ class MainActivity : AppCompatActivity(), OnDetectionStateChangedListener {
                 }
             }
 
+            // Inform user that the camera detected temperature
             lifecycleScope.collectLatestStream(viewModel.tempDetecting) { (first, state) ->
                 if (first && state == AppState.COLLECTING) {
                     Log.d(TAG, "Received first temperature of the user")
@@ -115,6 +118,7 @@ class MainActivity : AppCompatActivity(), OnDetectionStateChangedListener {
                 }
             }
 
+            // Handle user gone before finalizing temperature
             lifecycleScope.collectLatestStream(
                 viewModel.userInteraction
                     .debounce(2000)
@@ -128,12 +132,6 @@ class MainActivity : AppCompatActivity(), OnDetectionStateChangedListener {
         }
 
         prepareTemperatureMeasurement()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        robot.removeDetectionStateChangedListener(this)
     }
 
     private fun startMaskDetection() {
@@ -200,10 +198,8 @@ class MainActivity : AppCompatActivity(), OnDetectionStateChangedListener {
 
     companion object {
         const val CAMERA_PERMISSION = Manifest.permission.CAMERA
-        const val TEMP_COUNT = 3
-    }
 
-    override fun onDetectionStateChanged(state: Int) {
-        Log.d(TAG, "Detection state change: $state")
+        /** Number of temperature measurement needed to finalize. */
+        const val TEMP_COUNT = 3
     }
 }
