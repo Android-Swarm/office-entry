@@ -137,13 +137,15 @@
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/labelComeCloser"
             style="@style/TextAppearance.MaterialComponents.Headline5"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
             android:layout_marginTop="8dp"
             android:text="@string/label_too_far"
+            android:textAlignment="center"
             app:isVisible="@{sharedModel.appStateLive == AppState.COLLECTING &amp;&amp; !sharedModel.receivedUserTemperature}"
-            app:layout_constraintEnd_toEndOf="@id/labelTemperature"
-            app:layout_constraintStart_toStartOf="@id/labelTemperature"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/imageThermal"
             app:layout_constraintTop_toTopOf="@id/labelTemperature" />
 
         <com.google.android.material.textview.MaterialTextView

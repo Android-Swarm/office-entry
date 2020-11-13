@@ -96,7 +96,6 @@ class MainActivity : AppCompatActivity(), OnDetectionStateChangedListener {
                     Log.d(TAG, "Final temperature: %.2f".format(finalTemp))
                     viewModel.finalizeTemperature(finalTemp)
                     viewModel.updateApplicationState(AppState.COMPLETE)
-
                 }
 
                 AppState.COMPLETE -> {

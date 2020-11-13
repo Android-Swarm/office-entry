@@ -101,7 +101,7 @@ class MainActivityViewModel @ViewModelInject constructor(
             Log.d(TAG, "Temp: $temp, Distance: $distance")
 
             Pair(temp, distance)
-        }.filter { (temp, distance) -> temp in 30.0..42.0 && distance in Int.MIN_VALUE until 800 }
+        }.filter { (temp, distance) -> temp in 30.0..42.0 && distance in Int.MIN_VALUE until 700 }
         .map { (temp, _) -> temp.toFloat() }
 
     /** Temperature blasted from the camera. */

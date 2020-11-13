@@ -41,7 +41,6 @@ class ActivityModule {
             FaceDetection.getClient(this)
         }
 
-
     @Provides
     fun provideWifiManager(@ApplicationContext context: Context) =
         ContextCompat.getSystemService(context, WifiManager::class.java)!!

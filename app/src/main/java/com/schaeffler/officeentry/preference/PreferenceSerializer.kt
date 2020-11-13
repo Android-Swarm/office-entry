@@ -1,7 +1,7 @@
 package com.schaeffler.officeentry.preference
 
-import androidx.datastore.CorruptionException
-import androidx.datastore.Serializer
+import androidx.datastore.core.CorruptionException
+import androidx.datastore.core.Serializer
 import com.google.protobuf.InvalidProtocolBufferException
 import com.schaeffler.officeentry.Preference
 import java.io.InputStream
@@ -15,5 +15,8 @@ object PreferenceSerializer : Serializer<Preference> {
     }
 
     override fun writeTo(t: Preference, output: OutputStream) = t.writeTo(output)
+
+    override val defaultValue: Preference
+        get() = Preference.getDefaultInstance()
 
 }

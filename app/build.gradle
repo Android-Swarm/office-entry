@@ -119,7 +119,7 @@ dependencies {
     implementation 'com.airbnb.android:lottie:3.4.2'
 
     // Proto DataStore
-    implementation "androidx.datastore:datastore-core:1.0.0-alpha02"
+    implementation "androidx.datastore:datastore:1.0.0-alpha03"
     implementation "com.google.protobuf:protobuf-javalite:3.10.0"
 
     // Glide - Image Loading Library
