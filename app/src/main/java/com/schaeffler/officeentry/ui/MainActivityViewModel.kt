@@ -7,12 +7,16 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.ktx.Firebase
 import com.ogawa.temiirsdk.IrDataUtil
 import com.robotemi.sdk.TtsRequest
 import com.schaeffler.officeentry.R
 import com.schaeffler.officeentry.extensions.*
 import com.schaeffler.officeentry.preference.PreferenceRepository
 import com.schaeffler.officeentry.thermal.*
+import com.schaeffler.officeentry.utils.Analytics
 import com.schaeffler.officeentry.utils.AppState
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
@@ -38,6 +42,9 @@ class MainActivityViewModel @ViewModelInject constructor(
     val maskDetected = _maskDetected.debounce(1000).alsoDo {
         if (!it) {
             Log.d(TAG, "User not wearing mask!")
+
+            Firebase.analytics.logEvent(Analytics.EVENT_MASK_NOT_DETECTED) {}
+
             requestTemiSpeak(R.string.tts_no_mask_detected)
         } else {
             Log.d(TAG, "User is wearing mask")
@@ -115,9 +122,21 @@ class MainActivityViewModel @ViewModelInject constructor(
     val completionMessage = _finalTemperature.map {
         if (it > 37.4f) {
             requestTemiSpeak(R.string.tts_abnormal_temp, it)
+
+            // Log to Firebase analytics
+            Firebase.analytics.logEvent(Analytics.EVENT_ABNORMAL_TEMPERATURE) {
+                param(Analytics.PARAM_TEMPERATURE_VALUE, it.toDouble())
+            }
+
             getString(R.string.label_abnormal_temp)
         } else {
             requestTemiSpeak(R.string.tts_normal_temp, it)
+
+            // Log to Firebase analytics
+            Firebase.analytics.logEvent(Analytics.EVENT_NORMAL_TEMPERATURE) {
+                param(Analytics.PARAM_TEMPERATURE_VALUE, it.toDouble())
+            }
+
             getString(R.string.label_normal_temp)
         }
     }.asLiveData()

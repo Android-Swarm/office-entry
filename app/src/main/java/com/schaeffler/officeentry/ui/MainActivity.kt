@@ -161,7 +161,6 @@ class MainActivity : AppCompatActivity() {
                         viewModel.setMaskDetected(isWearingMask)
                     }
                 } ?: viewModel.setMaskDetected(true)
-
             }
         }
 
