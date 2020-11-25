@@ -101,3 +101,4 @@ lint/tmp/
 # lint/reports/
 
 **/*/res/values/secrets.xml
+**/*/google-services.json
